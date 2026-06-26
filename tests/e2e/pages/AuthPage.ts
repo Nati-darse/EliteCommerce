@@ -13,7 +13,7 @@ export class AuthPage {
     this.page = page 
     this.emailInput=page.getByLabel('email')
     this.passwordInput= page.getByLabel('password ')
-    this.submitButton =page.getByRole('button', {name : /signin|signup/i})
+    this.submitButton =page.getByRole('button', {name : /sign in|sign up/i})
         this.errorMessage = page.getByTestId('auth-error')
     this.successMessage = page.getByTestId('auth-success')
   
