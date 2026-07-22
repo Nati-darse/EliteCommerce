@@ -1,84 +1,57 @@
-import { useState, useMemo, useCallback } from 'react'
-import { useLocalStorage } from './useLocalStorage'
-import { useDebounce } from './useDebounce'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { createClient } from '@/lib/supabase/client'
+import { useEffect } from 'react'
 
 export interface Product {
   id: string
   name: string
   price: number
   category: string
-  inStock: boolean
+  in_stock: boolean
+  description?: string
+  image_url?: string
 }
 
-export interface ProductFilters {
-  search: string
-  category: string
-  minPrice: number
-  maxPrice: number
-  inStockOnly: boolean
+const supabase = createClient()
+
+// Fetch all products
+async function fetchProducts(): Promise<Product[]> {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (error) throw new Error(error.message)
+  return data
 }
 
-const DEFAULT_FILTERS: ProductFilters = {
-  search: '',
-  category: 'all',
-  minPrice: 0,
-  maxPrice: 10000,
-  inStockOnly: false,
-}
+// Main hook — products with realtime
+export function useProducts() {
+  const queryClient = useQueryClient()
 
-export function useProducts(products: Product[]) {
-  const [filters, setFilters] = useLocalStorage<ProductFilters>(
-    'elite-product-filters',
-    DEFAULT_FILTERS
-  )
+  const query = useQuery({
+    queryKey: ['products'],
+    queryFn: fetchProducts,
+  })
 
-  const debouncedSearch = useDebounce(filters.search, 300)
+  // Realtime subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('products-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'products' },
+        (payload) => {
+          console.log('Realtime update:', payload)
+          queryClient.invalidateQueries({ queryKey: ['products'] })
+        }
+      )
+      .subscribe()
 
-  // useMemo — only recalculates when products or filters actually change
-  // without this, filtering runs on EVERY render — kills performance at scale
-  const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const matchesSearch = product.name
-        .toLowerCase()
-        .includes(debouncedSearch.toLowerCase())
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [queryClient])
 
-      const matchesCategory =
-        filters.category === 'all' || product.category === filters.category
-
-      const matchesPrice =
-        product.price >= filters.minPrice && product.price <= filters.maxPrice
-
-      const matchesStock = !filters.inStockOnly || product.inStock
-
-      return matchesSearch && matchesCategory && matchesPrice && matchesStock
-    })
-  }, [products, debouncedSearch, filters.category, filters.minPrice, filters.maxPrice, filters.inStockOnly])
-
-  // useCallback — stable reference so child components don't re-render
-  // when parent re-renders for unrelated reasons
-  const updateFilter = useCallback(<K extends keyof ProductFilters>(
-    key: K,
-    value: ProductFilters[K]
-  ) => {
-    setFilters((prev) => ({ ...prev, [key]: value }))
-  }, [setFilters])
-
-  const resetFilters = useCallback(() => {
-    setFilters(DEFAULT_FILTERS)
-  }, [setFilters])
-
-  const categories = useMemo(() => {
-    const cats = [...new Set(products.map((p) => p.category))]
-    return ['all', ...cats]
-  }, [products])
-
-  return {
-    filteredProducts,
-    filters,
-    updateFilter,
-    resetFilters,
-    categories,
-    totalCount: products.length,
-    filteredCount: filteredProducts.length,
-  }
+  return query
 }

@@ -7,23 +7,32 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  reporter: 'html',
+  workers: process.env.CI ? '100%' : '50%',
+  reporter:process.env.CI ? 'list':'html',
   globalSetup: './tests/global-setup.ts', 
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: 'on-first-retry',
+
   },
 
    projects: [
+      {
+      name: 'setup',
+      testMatch: /global-setup\.ts/,
+    },
+
     {
       name: 'chromium',
       use: {
          ...devices['Desktop Chrome'],
           storageState: 'tests/.auth/user.json',
          },
+         dependencies: ['setup'],
     },
-
-    // {
+      // {
     //   name: 'firefox',
     //   use: { ...devices['Desktop Firefox'] },
     // },
@@ -32,10 +41,20 @@ export default defineConfig({
     //   name: 'webkit',
     //   use: { ...devices['Desktop Safari'] },
     // },
+
+      {
+      name: 'mobile-chrome',
+      use: {
+        ...devices['Pixel 5'],
+        storageState: 'tests/.auth/user.json',
+      },
+      dependencies: ['setup'],
+    },
   ],
   webServer: {
     command: 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
+    timeout : 120 * 1000,
   },
 })
