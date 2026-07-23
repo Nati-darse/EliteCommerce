@@ -9,7 +9,7 @@ export default function AuthLayout({
         
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold">
-            Elite<span className="text-indigo-500">Commerce</span>
+            Elite<span className="text-brand-600">Commerce</span>
           </h1>
           <p className="text-slate-500 text-sm mt-1">
             Your premium shopping destination
