@@ -10,6 +10,7 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/products', label: 'Products' },
   { href: '/dashboard', label: 'Dashboard' },
+  { href: '/featured', label: 'Featured' },
 ]
 
 export default function Navbar() {
@@ -28,7 +29,7 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="font-bold text-xl text-slate-900">
-          Elite<span className="text-indigo-500">Commerce</span>
+          Elite<span className="text-brand-600">Commerce</span>
         </Link>
 
         {/* Nav links */}
@@ -39,7 +40,7 @@ export default function Navbar() {
               href={href}
               className={`text-sm transition-colors ${
                 pathname === href
-                  ? 'text-indigo-600 font-medium'
+                  ? 'text-brand-600 font-medium'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -58,7 +59,7 @@ export default function Navbar() {
           <ShoppingCart className="h-4 w-4 mr-2" />
           Cart
           {cartCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-indigo-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            <span className="absolute -top-2 -right-2 bg-brand-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               {cartCount}
             </span>
           )}
