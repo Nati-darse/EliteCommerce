@@ -24,7 +24,7 @@ export async function GET(
   return NextResponse.json({ product: data })
 }
 
-// PATCH /api/products/:id
+// PATCH or update  /api/products/:id
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
