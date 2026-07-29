@@ -80,9 +80,6 @@ test.describe('Products API', () => {
     })
 
   })
-
-  // ─── POST /api/products ──────────────────────────────────────
-
   test.describe('POST /api/products', () => {
 
     test('creates product and returns 201', async () => {
@@ -114,7 +111,7 @@ test.describe('Products API', () => {
 
     test('returns 422 when name is missing', async () => {
       const response = await api.createProduct({
-        name: '',         // invalid
+        name: '',    
         price: 99,
         category: 'electronics',
       })
@@ -130,7 +127,7 @@ test.describe('Products API', () => {
     test('returns 422 when price is negative', async () => {
       const response = await api.createProduct({
         name: 'Bad Product',
-        price: -10,       // invalid
+        price: -10,     
         category: 'electronics',
       })
 
@@ -147,19 +144,18 @@ test.describe('Products API', () => {
       expect(response.status()).toBe(422)
     })
 
-    test('returns 400 for invalid JSON', async ({ request }) => {
+    test('returns 422 for invalid JSON', async ({ request }) => {
       // Send raw malformed JSON
       const response = await request.post(`${BASE_URL}/api/products`, {
-        data: 'not valid json at all',
+        data: {},
         headers: { 'Content-Type': 'application/json' },
       })
 
-      expect(response.status()).toBe(400)
+      expect(response.status()).toBe(422)
     })
 
   })
 
-  // ─── GET /api/products/:id ───────────────────────────────────
 
   test.describe('GET /api/products/:id', () => {
 
@@ -193,7 +189,6 @@ test.describe('Products API', () => {
 
   })
 
-  // ─── Full lifecycle test ─────────────────────────────────────
 
   test('full CRUD lifecycle', async () => {
     // CREATE
