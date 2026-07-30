@@ -1,6 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
+
+const adminClient = createAdminClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+) 
 // GET /api/products
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
@@ -69,7 +75,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await adminClient
     .from('products')
     .insert({
       name: name.trim(),
