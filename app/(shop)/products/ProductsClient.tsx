@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { useProducts } from '@/hooks/useProducts'
 import { useStore } from '@/store'
 import { useDebounce } from '@/hooks/useDebounce'
+import Link from 'next/link'
 
 
 export default function ProductsPage() {
@@ -64,6 +65,13 @@ export default function ProductsPage() {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Products</h1>
+
+      <div className="flex items-center justify-between mb-6">
+  <h1 className="text-3xl font-bold text-slate-900">Products</h1>
+  <Button asChild className="bg-brand-600 hover:bg-brand-700 text-white border-0">
+    <Link href="/products/new">+ Add product</Link>
+  </Button>
+</div>
 
       {/* Filters */}
       <div className="flex gap-4 mb-6 flex-wrap items-center">

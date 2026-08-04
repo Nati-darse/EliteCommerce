@@ -24,7 +24,6 @@ export default function AddProductForm() {
 
   return (
     <form action={action} className="space-y-6">
-
       {/* Global error/success message */}
       <FormMessage error={state.error} success={state.success} />
 
