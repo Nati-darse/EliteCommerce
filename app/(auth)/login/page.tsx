@@ -28,7 +28,7 @@ export default function LoginPage() {
       return
     }
 
-    router.push('/products/new')
+    router.push('/products')
   }
 
   return (
